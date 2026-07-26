@@ -1,10 +1,9 @@
 from flask import Flask, request, render_template_string import datetime import traceback
 
 app = Flask(__name__)
-
 tasks = []
 
-HTML = """
+HTML = '''
 <!DOCTYPE html>
 <html>
 <head>
@@ -26,4 +25,27 @@ HTML = """
     {% endif %}
     
     <form method="POST">
-        <input
+        <input type="text" name="task" placeholder="Describe your task..." required>
+        <button type="submit">Create Task</button>
+    </form>
+
+    <h2>Your Tasks</h2>
+    {% for t in tasks %}
+        <div class="task">
+            <strong>{{ t.title }}</strong><br>
+            Schedule: {{ t.schedule }}
+        </div>
+    {% else %}
+        <p>No tasks yet.</p>
+    {% endfor %}
+</body>
+</html>
+'''
+
+@app.route("/", methods=["GET", "POST"]) def home():
+    error = None
+    try:
+        if request.method == "POST":
+            title = request.form.get("task", "").strip()
+            if not title:
+                error = "Please enter a task description."
